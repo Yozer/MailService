@@ -5,6 +5,7 @@ using AutoMapper.Contrib.Autofac.DependencyInjection;
 using FluentValidation.AspNetCore;
 using MailService.Api.Infrastructure;
 using MailService.Api.Infrastructure.Mongo;
+using MailService.Api.Infrastructure.Smtp;
 using MailService.Api.Model;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -37,6 +38,8 @@ namespace MailService.Api
                     o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
                 .AddFluentValidation(o => o.RegisterValidatorsFromAssembly(typeof(Program).Assembly));
+
+            services.Configure<SmtpOptions>(Configuration.GetSection("smtp"));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -46,6 +49,8 @@ namespace MailService.Api
             builder.AddMongo();
 
             builder.AddMongoRepository<EmailsRepository, EmailEntity>("emails");
+
+            builder.RegisterType<SmtpClientWrapper>().AsImplementedInterfaces();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
