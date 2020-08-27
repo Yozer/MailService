@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoMapper;
-using MailService.Api.Infrastructure;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace MailService.Api.Tests
 {
-    public class AutoMapperTests
+    public class AutoMapperTests : TestBase
     {
         [Test]
         public void ValidateAutoMapper()
         {
-            var profile = new AutoMapperProfile();
-            var configuration = new MapperConfiguration(t => t.AddProfile(profile));
+            var configuration = GetMapperConfig();
             configuration.AssertConfigurationIsValid();
         }
     }

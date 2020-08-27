@@ -1,5 +1,10 @@
+using System;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using AutoFixture.Kernel;
+using AutoMapper;
+using MailService.Api.Infrastructure;
+using MailService.Api.Model;
 using NUnit.Framework;
 
 namespace MailService.Api.Tests
@@ -13,13 +18,42 @@ namespace MailService.Api.Tests
         {
             Fixture = new Fixture()
                 .Customize(new AutoNSubstituteCustomization());
+            Fixture.Customizations.Add(new EmailEntityGenerator());
 
+            Fixture.Inject<IMapper>(new Mapper(GetMapperConfig()));
         }
 
-        public T Freeze<T>()
+        protected T Freeze<T>()
             => Fixture.Freeze<T>();
 
-        public T Create<T>()
+        protected T Create<T>()
             => Fixture.Create<T>();
+
+        protected IConfigurationProvider GetMapperConfig()
+        {
+            var profile = new AutoMapperProfile();
+            var configuration = new MapperConfiguration(t => t.AddProfile(profile));
+            return configuration;
+        }
+    }
+
+    public class EmailEntityGenerator : ISpecimenBuilder
+    {
+        public object Create(object request, ISpecimenContext context)
+        {
+            var type = request as Type;
+
+            if (type == null)
+                return new NoSpecimen();
+
+            if (type != typeof(EmailEntity))
+                return new NoSpecimen();
+
+            return new EmailEntity(
+                context.Create<string>(), 
+                context.Create<string>(), 
+                "from@gmail.com", new[] {"first@wp.pl", "second@wp.pl"},
+                context.Create<EmailPriority>());
+        }
     }
 }
