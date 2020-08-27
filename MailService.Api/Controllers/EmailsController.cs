@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MailService.Api.Commands;
 using MailService.Api.Dto;
@@ -20,10 +21,10 @@ namespace MailService.Api.Controllers
             => _mediator = mediator;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmailDto>>> GetAll()
+        public async Task<ActionResult<List<EmailDto>>> GetAll()
         {
             var result = await Send(new GetAllEmailsQuery());
-            return Ok(result);
+            return result.ToList();
         }
 
         [HttpGet("{id}")]
@@ -36,13 +37,16 @@ namespace MailService.Api.Controllers
         }
 
         [HttpGet("{id}/status")]
-        public async Task<ActionResult> GetOneStatus(Guid id)
+        public async Task<ActionResult<EmailStatusDto>> GetOneStatus(Guid id)
         {
             var result = await Send(new GetEmailQuery(id));
             if (result == null)
                 return NotFound();
 
-            return Ok(new {result.Status});
+            return new EmailStatusDto
+            {
+                Status = result.Status
+            };
         }
 
         [HttpPatch("{id}")]
@@ -56,7 +60,7 @@ namespace MailService.Api.Controllers
         }
 
         [HttpPost("{id}/attachments")]
-        public async Task<ActionResult<EmailDto>> AddAttachments(string id, [FromBody] ICollection<IFormFile> attachments)
+        public async Task<ActionResult> AddAttachments(string id, [FromBody] ICollection<IFormFile> attachments)
         {
             await Send(new AddAttachmentsToEmailCommand(id, attachments));
             return Ok();
