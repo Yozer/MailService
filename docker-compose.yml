@@ -1,0 +1,25 @@
+version: '3.4'
+
+services:
+  mailservice.api:
+    image: ${DOCKER_REGISTRY-}mailserviceapi
+    build:
+      context: .
+      dockerfile: MailService.Api/Dockerfile
+    depends_on:
+      - mongo
+
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dbuser
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    image: mongo:4
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - emails_mongo:/data/db
+
+volumes:
+  emails_mongo:
+    driver: local

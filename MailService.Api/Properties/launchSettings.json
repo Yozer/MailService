@@ -13,7 +13,9 @@
       "commandName": "Docker",
       "launchBrowser": false,
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": true,
+      "httpPort": 5000,
+      "sslPort": 5001
     }
   }
 }
