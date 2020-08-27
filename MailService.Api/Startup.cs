@@ -1,3 +1,7 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using FluentValidation.AspNetCore;
+using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +22,13 @@ namespace MailService.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(o => o.RegisterValidatorsFromAssembly(typeof(Program).Assembly));
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.AddMediatR(typeof(Program).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
