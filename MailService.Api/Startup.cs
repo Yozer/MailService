@@ -57,6 +57,7 @@ namespace MailService.Api
             }
 
             app.UseHttpsRedirection();
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
