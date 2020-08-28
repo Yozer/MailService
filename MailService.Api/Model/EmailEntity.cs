@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace MailService.Api.Model
 {
@@ -36,10 +37,35 @@ namespace MailService.Api.Model
             ValidateAndThrow();
         }
 
+        public void ChangeStatusToSent()
+        {
+            if(Status == EmailStatus.Sent)
+                throw new ValidationException("Email was already sent");
+
+            Status = EmailStatus.Sent;
+        }
+
+        public void AddAttachment(string fileName, byte[] data)
+        {
+            _attachments.Add(new EmailAttachmentEntity(fileName, data));
+            var validated = Validate();
+            if (!validated.IsValid)
+            {
+                _attachments.RemoveAt(_attachments.Count - 1); // O(1)
+                throw new ValidationException(validated.Errors);
+            }
+        }
+
         private void ValidateAndThrow()
         {
             var validator = new EmailEntityValidator();
             validator.ValidateAndThrow(this);
+        }
+
+        private ValidationResult Validate()
+        {
+            var validator = new EmailEntityValidator();
+            return validator.Validate(this);
         }
 
         private class EmailEntityValidator : AbstractValidator<EmailEntity>
@@ -61,10 +87,15 @@ namespace MailService.Api.Model
 
         private class AttachmentValidator : AbstractValidator<EmailAttachmentEntity>
         {
+            private const int MaxAttachmentSizeInBytes = 10 * 1024 * 1024; //10MB
+
             public AttachmentValidator()
             {
                 RuleFor(t => t.Name).NotEmpty();
                 RuleFor(t => t.Data).NotEmpty();
+                RuleFor(t => t.Data.Length)
+                    .LessThanOrEqualTo(MaxAttachmentSizeInBytes)
+                    .WithMessage($"Attachment size should be smaller than {MaxAttachmentSizeInBytes} bytes");
             }
         }
     }
