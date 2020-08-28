@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentValidation;
@@ -93,6 +94,36 @@ namespace MailService.Api.Tests
             email.Priority.Should().Be(priority);
             email.Body.Should().Be(body);
             email.To.Should().BeEquivalentTo(ValidRecipients);
+        }
+
+        [Theory, AutoData]
+        public void ShouldAddAttachment_ForSmallAttachment(string attachment, byte[] data)
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+
+            // act
+            email.AddAttachment(attachment, data);
+
+            // assert
+            email.Attachments.Should().HaveCount(1);
+            email.Attachments[0].Data.Should().BeEquivalentTo(data);
+            email.Attachments[0].Name.Should().Be(attachment);
+        }
+
+        [Theory, AutoData]
+        public void ShouldThrow_WhenAddingAttachment_ForLargeAttachment(string attachment)
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+            var data = Enumerable.Repeat((byte)0, 10 * 1024 * 1024 + 1).ToArray();
+
+            // act
+            Action act = () => email.AddAttachment(attachment, data);
+
+            // assert
+            act.Should().ThrowExactly<ValidationException>()
+                .WithMessage("*Attachment size should be smaller than 10485760 bytes");
         }
     }
 }
