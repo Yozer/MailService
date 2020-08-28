@@ -62,7 +62,10 @@ namespace MailService.Api.Controllers
         [HttpPost("{id}/attachments")]
         public async Task<ActionResult> AddAttachments(Guid id, [FromForm] ICollection<IFormFile> attachments)
         {
-            await Send(new AddAttachmentsToEmailCommand(id, attachments));
+            var foundEmailToUpdate = await Send(new AddAttachmentsToEmailCommand(id, attachments));
+            if (!foundEmailToUpdate)
+                return NotFound();
+
             return Ok();
         }
 

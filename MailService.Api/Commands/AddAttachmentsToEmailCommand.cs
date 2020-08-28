@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace MailService.Api.Commands
 {
-    public class AddAttachmentsToEmailCommand : IRequest
+    public class AddAttachmentsToEmailCommand : IRequest<bool>
     {
         public Guid Id { get; }
         public ICollection<IFormFile> Attachments { get; }
