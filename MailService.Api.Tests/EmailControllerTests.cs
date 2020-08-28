@@ -140,7 +140,7 @@ namespace MailService.Api.Tests
             _mediator.Send(Arg.Is<AddAttachmentsToEmailCommand>(
                     t => t.Id == id &&
                          t.Attachments.SequenceEqual(files)))
-                .Returns(Unit.Value);
+                .Returns(true);
 
             // act
             var actionResult = await _controller.AddAttachments(id, files);
