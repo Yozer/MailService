@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -6,10 +7,10 @@ namespace MailService.Api.Commands
 {
     public class AddAttachmentsToEmailCommand : IRequest
     {
-        public string Id { get; }
+        public Guid Id { get; }
         public ICollection<IFormFile> Attachments { get; }
 
-        public AddAttachmentsToEmailCommand(string id, ICollection<IFormFile> attachments)
+        public AddAttachmentsToEmailCommand(Guid id, ICollection<IFormFile> attachments)
         {
             Id = id;
             Attachments = attachments;

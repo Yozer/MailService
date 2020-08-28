@@ -50,7 +50,7 @@ namespace MailService.Api.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult> PatchEmail(Guid id, [FromBody] PatchEmailDto patch)
+        public async Task<ActionResult> PatchEmail(Guid id, [FromBody] CreateEmailDto patch)
         {
             var foundEmailToUpdated = await Send(new PatchEmailCommand(id, patch));
             if (!foundEmailToUpdated)
@@ -60,14 +60,14 @@ namespace MailService.Api.Controllers
         }
 
         [HttpPost("{id}/attachments")]
-        public async Task<ActionResult> AddAttachments(string id, [FromBody] ICollection<IFormFile> attachments)
+        public async Task<ActionResult> AddAttachments(Guid id, [FromForm] ICollection<IFormFile> attachments)
         {
             await Send(new AddAttachmentsToEmailCommand(id, attachments));
             return Ok();
         }
 
         [HttpPost]
-        public async Task<ActionResult<EmailDto>> AddEmail(EmailDto email)
+        public async Task<ActionResult<EmailDto>> AddEmail(CreateEmailDto email)
         {
             var result = await Send(new CreateEmailCommand(email));
             return CreatedAtAction(nameof(GetOne), new {id = result.Id}, result);

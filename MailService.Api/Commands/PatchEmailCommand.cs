@@ -7,9 +7,9 @@ namespace MailService.Api.Commands
     public class PatchEmailCommand : IRequest<bool>
     {
         public Guid Id { get; }
-        public PatchEmailDto Patch { get; }
+        public CreateEmailDto Patch { get; }
 
-        public PatchEmailCommand(Guid id, PatchEmailDto patch)
+        public PatchEmailCommand(Guid id, CreateEmailDto patch)
         {
             Id = id;
             Patch = patch;

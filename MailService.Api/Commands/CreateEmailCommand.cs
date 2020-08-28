@@ -5,9 +5,9 @@ namespace MailService.Api.Commands
 {
     public class CreateEmailCommand : IRequest<EmailDto>
     {
-        public EmailDto Email { get; }
+        public CreateEmailDto Email { get; }
 
-        public CreateEmailCommand(EmailDto email) 
+        public CreateEmailCommand(CreateEmailDto email) 
             => Email = email;
     }
 }
