@@ -12,7 +12,6 @@ using MailService.Api.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -134,7 +133,7 @@ namespace MailService.Api.Tests
         }
 
         [Theory, AutoData]
-        public async Task ShouldReachToMediator_ToAddAttachments(string id)
+        public async Task ShouldReachToMediator_ToAddAttachments(Guid id)
         {
             // arrange
             var files = Fixture.CreateMany<IFormFile>().ToList();
@@ -151,17 +150,17 @@ namespace MailService.Api.Tests
         }
 
         [Theory, AutoData]
-        public async Task ShouldReachToMediator_ToCreateNewEmail(EmailDto expectedEmail)
+        public async Task ShouldReachToMediator_ToCreateNewEmail(CreateEmailDto createDto, EmailDto expectedEmail)
         {
             // arrange
             _mediator.Send(Arg.Is<CreateEmailCommand>(
-                    t => t.Email == expectedEmail))
+                    t => t.Email == createDto))
                 .Returns(expectedEmail);
 
             // act
-            var actionResult = await _controller.AddEmail(expectedEmail);
+            var actionResult = await _controller.AddEmail(createDto);
 
-            // assert
+            // assert6
             actionResult.Result.Should().BeOfType<CreatedAtActionResult>();
             ((CreatedAtActionResult) actionResult.Result).Value
                 .Should().BeEquivalentTo(expectedEmail);

@@ -82,7 +82,7 @@ namespace MailService.Api.Tests
 
 
         [Theory, AutoData]
-        public void ShouldSuccessfullyCreate_WhenValidObjectIsGiven(string subject, string body, EmailPriority priority)
+        public void ShouldSuccessfullyCreateEmail_WhenValidObjectIsGiven(string subject, string body, EmailPriority priority)
         {
             // act
             var email = new EmailEntity(subject, body, ValidEmail, ValidRecipients, priority);
