@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MailService.Api.Commands;
 using MailService.Api.Commands.Handlers;
+using MailService.Api.Dto;
 using MailService.Api.Model;
 using NSubstitute;
 using NUnit.Framework;
@@ -44,6 +45,34 @@ namespace MailService.Api.Tests.Commands
                                                       t.Priority == command.Patch.Priority &&
                                                       t.Subject == command.Patch.Subject &&
                                                       t.Body == command.Patch.Body));
+
+            foundEmailToUpdate.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task ShouldNotUpdateEmail_WhenNothingWasChanged()
+        {
+            // arrange
+            var emailEntity = Create<EmailEntity>();
+            _repository.GetEmail(emailEntity.Id)
+                .Returns(emailEntity);
+
+            var patch = new CreateEmailDto
+            {
+                Priority = emailEntity.Priority,
+                To = emailEntity.To.ToList(),
+                Sender = emailEntity.Sender,
+                Body = emailEntity.Body,
+                Subject = emailEntity.Subject
+            };
+            var command = new PatchEmailCommand(emailEntity.Id, patch);
+
+            // act
+            var foundEmailToUpdate = await _handler.Handle(command, CancellationToken.None);
+
+            // assert
+            await _repository.DidNotReceiveWithAnyArgs()
+                .UpdateEmail(default);
 
             foundEmailToUpdate.Should().BeTrue();
         }
