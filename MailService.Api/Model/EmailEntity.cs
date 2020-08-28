@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using FluentValidation;
 using FluentValidation.Results;
 
@@ -14,7 +17,12 @@ namespace MailService.Api.Model
         public EmailPriority Priority { get; private set; }
 
         private List<string> _to;
-        public IReadOnlyList<string> To => _to?.AsReadOnly();
+
+        public IReadOnlyList<string> To
+        {
+            get => _to?.AsReadOnly();
+            set => _to = value.ToList();
+        }
 
         private List<EmailAttachmentEntity> _attachments;
         public IReadOnlyList<EmailAttachmentEntity> Attachments => _attachments?.AsReadOnly();
@@ -47,6 +55,8 @@ namespace MailService.Api.Model
 
         public void AddAttachment(string fileName, byte[] data)
         {
+            ThrowIfAlreadySent();
+
             _attachments.Add(new EmailAttachmentEntity(fileName, data));
             var validated = Validate();
             if (!validated.IsValid)
@@ -56,10 +66,51 @@ namespace MailService.Api.Model
             }
         }
 
+        public void UpdateSender(string sender) 
+            => TryUpdate(t => t.Sender, sender);
+
+        public void UpdateTo(List<string> to)
+            => TryUpdate(t => t.To, to);
+
+        public void UpdateBody(string body)
+            => TryUpdate(t => t.Body, body);
+
+        public void UpdateSubject(string subject)
+            => TryUpdate(t => t.Subject, subject);
+
+        public void UpdatePriority(EmailPriority priority)
+            => TryUpdate(t => t.Priority, priority);
+
+        private void TryUpdate<T>(Expression<Func<EmailEntity, T>> expression, T newValue)
+        {
+            ThrowIfAlreadySent();
+
+            var func = expression.Compile();
+            var oldValue = func(this);
+            var memberExpression = (MemberExpression)expression.Body;
+            var propertyInfo = (PropertyInfo)memberExpression.Member;
+
+            propertyInfo.SetValue(this, newValue);
+            var validated = Validate();
+
+            if (!validated.IsValid)
+            {
+                propertyInfo.SetValue(this, oldValue);
+                throw new ValidationException(validated.Errors);
+            }
+        }
+
+
         private void ValidateAndThrow()
         {
             var validator = new EmailEntityValidator();
             validator.ValidateAndThrow(this);
+        }
+
+        private void ThrowIfAlreadySent()
+        {
+            if(Status == EmailStatus.Sent)
+                throw new ValidationException("Unable to update email. It was already sent.");
         }
 
         private ValidationResult Validate()
