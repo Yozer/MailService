@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture;
-using AutoFixture.NUnit3;
 using FluentAssertions;
 using MailService.Api.Commands;
 using MailService.Api.Commands.Handlers;

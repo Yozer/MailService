@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
 using AutoFixture;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using MailService.Api.Commands;
 using MailService.Api.Controllers;

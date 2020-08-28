@@ -6,7 +6,6 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using DnsClient.Internal;
 using MailService.Api.Infrastructure.Smtp;
 using MailService.Api.Model;
 using MediatR;

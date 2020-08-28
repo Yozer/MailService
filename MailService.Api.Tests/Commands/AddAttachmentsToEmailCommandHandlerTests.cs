@@ -10,7 +10,6 @@ using FluentAssertions;
 using MailService.Api.Commands;
 using MailService.Api.Commands.Handlers;
 using MailService.Api.Model;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using NUnit.Framework;

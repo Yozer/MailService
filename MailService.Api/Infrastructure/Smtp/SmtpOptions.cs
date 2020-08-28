@@ -1,6 +1,4 @@
-﻿using System.Security;
-
-namespace MailService.Api.Infrastructure.Smtp
+﻿namespace MailService.Api.Infrastructure.Smtp
 {
     public class SmtpOptions
     {
