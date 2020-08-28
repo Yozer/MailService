@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Kernel;
 using AutoMapper;
+using MailService.Api.Dto;
 using MailService.Api.Infrastructure;
 using MailService.Api.Model;
 using NUnit.Framework;
@@ -19,6 +22,7 @@ namespace MailService.Api.Tests
             Fixture = new Fixture()
                 .Customize(new AutoNSubstituteCustomization());
             Fixture.Customizations.Add(new EmailEntityGenerator());
+            Fixture.Customizations.Add(new CreateEmailDtoGenerator());
 
             Fixture.Inject<IMapper>(new Mapper(GetMapperConfig()));
         }
@@ -54,6 +58,29 @@ namespace MailService.Api.Tests
                 context.Create<string>(), 
                 "from@gmail.com", new[] {"first@wp.pl", "second@wp.pl"},
                 context.Create<EmailPriority>());
+        }
+    }
+
+    public class CreateEmailDtoGenerator : ISpecimenBuilder
+    {
+        public object Create(object request, ISpecimenContext context)
+        {
+            var type = request as Type;
+
+            if (type == null)
+                return new NoSpecimen();
+
+            if (type != typeof(CreateEmailDto))
+                return new NoSpecimen();
+
+            return new CreateEmailDto
+            {
+                To = new[] {"first@wp.pl", "second@wp.pl"}.ToList(),
+                Sender = "from@onet.eu",
+                Body = context.Create<string>(),
+                Subject = context.Create<string>(),
+                Priority = context.Create<EmailPriority>()
+            };
         }
     }
 }
