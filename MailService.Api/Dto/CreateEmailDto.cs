@@ -9,7 +9,7 @@ namespace MailService.Api.Dto
         public string Subject { get; set; }
         public string Body { get; set; }
         public string Sender { get; set; }
-        public EmailPriority Priority { get; set; } = EmailPriority.Normal;
+        public EmailPriority? Priority { get; set; }
         public List<string> To { get; set; }
     }
 }
