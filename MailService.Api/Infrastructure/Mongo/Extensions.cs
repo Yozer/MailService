@@ -54,12 +54,13 @@ namespace MailService.Api.Infrastructure.Mongo
             where TRepository : IMongoRepository<TEntity> 
             where TEntity : Entity
         {
+            builder.Register(ctx =>
+                {
+                    return ctx.Resolve<IMongoDatabase>().GetCollection<TEntity>(collectionName);
+                })
+                .InstancePerLifetimeScope();
             builder
                 .RegisterType<TRepository>()
-                .WithParameter(
-                    new ResolvedParameter(
-                        (pi, ctx) => pi.ParameterType == typeof(IMongoCollection<TEntity>),
-                        (pi, ctx) => ctx.Resolve<IMongoDatabase>().GetCollection<TEntity>(collectionName)))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
         }
