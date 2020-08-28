@@ -75,7 +75,7 @@ namespace MailService.Api.Tests
 
             return new CreateEmailDto
             {
-                To = new[] {"first@wp.pl", "second@wp.pl"}.ToList(),
+                To = new[] {"first@test.pl", "second@test.pl"}.ToList(),
                 Sender = "from@onet.eu",
                 Body = context.Create<string>(),
                 Subject = context.Create<string>(),

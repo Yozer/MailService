@@ -125,5 +125,63 @@ namespace MailService.Api.Tests
             act.Should().ThrowExactly<ValidationException>()
                 .WithMessage("*Attachment size should be smaller than 10485760 bytes");
         }
+
+        [Test]
+        public void ShouldThrow_WhenAddingAttachment_ForEmailAlreadySent()
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+            email.ChangeStatusToSent();
+
+            // act
+            Action act = () => email.AddAttachment(default, default);
+
+            // assert
+            act.Should().ThrowExactly<ValidationException>()
+                .WithMessage("Unable to update email. It was already sent.");
+        }
+
+        [Test]
+        public void UpdateSender_ShouldFailWhenEmailWasSent()
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+            email.ChangeStatusToSent();
+
+            // act
+            Action act = () => email.UpdateSender(ValidEmail);
+
+            // assert
+            act.Should().ThrowExactly<ValidationException>()
+                .WithMessage("Unable to update email. It was already sent.");
+        }
+
+        [Test]
+        public void UpdateSender_ShouldFailForInvalidEmail()
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+
+            // act
+            Action act = () => email.UpdateSender(Create<string>());
+
+            // assert
+            act.Should().ThrowExactly<ValidationException>()
+                .WithMessage("*'Sender' is not a valid email address.");
+        }
+
+        [Test]
+        public void UpdateSender_ShouldSuccessForValidEmail()
+        {
+            // arrange
+            var email = Create<EmailEntity>();
+
+            // act
+            Action act = () => email.UpdateSender(ValidEmail);
+
+            // assert
+            act.Should().NotThrow();
+            email.Sender.Should().Be(ValidEmail);
+        }
     }
 }
