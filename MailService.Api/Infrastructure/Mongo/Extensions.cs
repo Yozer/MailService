@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Autofac;
-using Autofac.Core;
 using MailService.Api.Model;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -30,13 +29,6 @@ namespace MailService.Api.Infrastructure.Mongo
                 BsonSerializer.RegisterSerializer(typeof(decimal), new DecimalSerializer(BsonType.Decimal128));
                 BsonSerializer.RegisterSerializer(typeof(decimal?), new NullableSerializer<decimal>(new DecimalSerializer(BsonType.Decimal128)));
                 ConventionRegistry.Register("Conventions", new MongoDbConventions(), x => true);
-
-                BsonClassMap.RegisterClassMap<EmailEntity>(map =>
-                {
-                    map.AutoMap();
-                    map.MapField("_to").SetElementName(nameof(EmailEntity.To).ToLower());
-                    map.MapField("_attachments").SetElementName(nameof(EmailEntity.Attachments).ToLower());
-                });
 
                 return new MongoClient(options.ConnectionString);
             }).SingleInstance();

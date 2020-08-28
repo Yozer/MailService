@@ -21,11 +21,15 @@ namespace MailService.Api.Model
         public IReadOnlyList<string> To
         {
             get => _to?.AsReadOnly();
-            set => _to = value.ToList();
+            private set => _to = value.ToList();
         }
 
         private List<EmailAttachmentEntity> _attachments;
-        public IReadOnlyList<EmailAttachmentEntity> Attachments => _attachments?.AsReadOnly();
+        public IReadOnlyList<EmailAttachmentEntity> Attachments 
+        {
+            get => _attachments?.AsReadOnly();
+            private set => _attachments = value.ToList();
+        }
 
         public EmailEntity(string subject, string body, string sender, IEnumerable<string> to) 
             : this(subject, body, sender, to, EmailPriority.Normal)
