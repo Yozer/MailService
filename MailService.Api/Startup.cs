@@ -40,6 +40,7 @@ namespace MailService.Api
                 .AddFluentValidation(o => o.RegisterValidatorsFromAssembly(typeof(Program).Assembly));
 
             services.Configure<SmtpOptions>(Configuration.GetSection("smtp"));
+            services.AddSwaggerGen();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -63,6 +64,11 @@ namespace MailService.Api
 
             app.UseHttpsRedirection();
             app.UseMiddleware<ErrorHandlerMiddleware>();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Api V1");
+            });
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
