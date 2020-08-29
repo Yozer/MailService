@@ -50,12 +50,7 @@ namespace MailService.Api.Model
         }
 
         public void ChangeStatusToSent()
-        {
-            if(Status == EmailStatus.Sent)
-                throw new ValidationException("Email was already sent");
-
-            Status = EmailStatus.Sent;
-        }
+            => TryUpdate(t => t.Status, EmailStatus.Sent);
 
         public void AddAttachment(string fileName, byte[] data)
         {
@@ -103,7 +98,6 @@ namespace MailService.Api.Model
                 throw new ValidationException(validated.Errors);
             }
         }
-
 
         private void ValidateAndThrow()
         {
